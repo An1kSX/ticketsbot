@@ -143,7 +143,7 @@ async def text_handler(_, message):
 	elif state == 'affidavit1':
 		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I could not perform the work as directed because that portion of the premises in which the work performed was physically Inaccessible. The Inaccessibility was due to {message.text}'
 		await message.reply(
-			text='<b>Send video/photo:</b>',
+			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
 		users[message.chat.id]['state'] = 'send_media'
@@ -211,7 +211,7 @@ async def text_handler(_, message):
 	elif state == 'description2':
 		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\nIndividual description: {message.text}'
 		await message.reply(
-			text='<b>Send video/photo:</b>',
+			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
 		users[message.chat.id]['state'] = 'send_media'
@@ -231,26 +231,26 @@ async def text_handler(_, message):
 				return
 
 		await message.reply(
-			text='<b>Send video/photo:</b>',
+			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
 		users[message.chat.id]['state'] = 'send_media'
 
 	elif state == 'affidavit3':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I have performed this work beginning on {message.text} '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I have performed this work beginning on {message.text}'
+		await message.reply(
+			text='<b>and completing it on:</b>',
+			reply_markup=ReplyKeyboardRemove()
+			)
+		users[message.chat.id]['state'] = 'affidavit3.3'
+
+	elif state == 'affidavit3.3':
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f' and completing it on {message.text}'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
-		users[message.chat.id]['state'] = 'send_media_affidavit3.1'
-
-	elif state == 'affidavit3.3':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'and completing it on {message.text}'
-		await message.reply(
-			text='<b>Send video/photo AFTER:</b>',
-			reply_markup=ReplyKeyboardRemove()
-			)
-		users[message.chat.id]['state'] = 'send_media_affidavit3.2'
+		users[message.chat.id]['state'] = 'send_media'
 
 	elif state == 'affidavit4_':
 		match message.text:
@@ -287,41 +287,16 @@ async def text_handler(_, message):
 		await text_handler(_, message)
 
 	elif state == 'affidavit4_5':
-		datetime.strptime(message.text, '%m/%d/%Y')
 		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
 		message.text = '2'
 		users[message.chat.id]['state'] = 'affidavit4.1'
 		await text_handler(_, message)
 
 	elif state == 'affidavit4_6':
-		datetime.strptime(message.text, '%m/%d/%Y')
 		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
 		message.text = '3'
 		users[message.chat.id]['state'] = 'affidavit4.1'
 		await text_handler(_, message)
-
-	elif state == 'affidavit4':
-		try:
-			datetime.strptime(message.text, '%m/%d/%Y')
-			users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
-			await message.reply(
-				text='''1) I found that the work described in the OMO had been completed by others
-2) I found a contractor
-3) I found that the work described in the OMO was partially performed by others
-''',
-				reply_markup=ReplyKeyboardMarkup([
-					[KeyboardButton('1')],
-					[KeyboardButton('2')],
-					[KeyboardButton('3')]
-					],
-					resize_keyboard=True)
-				)
-			users[message.chat.id]['state'] = 'affidavit4.1'
-
-		except:
-			await message.reply(
-				text='Wrong date format\n\n<i>(mm/dd/yy)</i>'
-				)
 
 	elif state == 'affidavit4.1':
 		match message.text:
@@ -363,7 +338,7 @@ async def text_handler(_, message):
 	elif state == 'affidavit4.2.1':
 		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I am entitled to a service charge of $ {message.text}'
 		await message.reply(
-			text='<b>Send video/photo:</b>',
+			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
 		users[message.chat.id]['state'] = 'send_media'
@@ -379,7 +354,7 @@ async def text_handler(_, message):
 	elif state == 'affidavit4.2.3':
 		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I performed the remaining work described in the OMO, and am entitled to a charge in the amount of $ {message.text}. (To be compensated for this work, the Contractor must attach an itemized invoice of work performed.)'
 		await message.reply(
-			text='<b>Send video/photo:</b>',
+			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
 			)
 		users[message.chat.id]['state'] = 'send_media'
@@ -423,53 +398,42 @@ async def media_group_handler(_, message):
 		return
 
 	state = users[message.chat.id]['state']
-	if state in ['send_media_affidavit3.1', 'send_media_affidavit3.2']:
-		if state == 'send_media_affidavit3.1':
-			users[message.chat.id]['media'] = [InputMediaPhoto(msg.photo.file_id) if msg.photo else InputMediaVideo(msg.video.file_id) for msg in media_messages]
-			await message.reply(
-				text='<b>and completing it on:</b>',
-				reply_markup=ReplyKeyboardRemove()
-				)
-			users[message.chat.id]['state'] = 'affidavit3.3'
 
-		elif state == 'send_media_affidavit3.2':
-			users[message.chat.id]['media'] += [InputMediaPhoto(msg.photo.file_id) if msg.photo else InputMediaVideo(msg.video.file_id) for msg in media_messages]
-			
-			media_group = users[message.chat.id]['media']
-			media_group[len(media_group) - 1].caption = f'''OMO: {users[message.chat.id]["OMO"]}\n{users[message.chat.id]["AFFIDAVIT"]}\n{users[message.chat.id]["AFFIDAVIT_TEXT"]}'''
+	if state == 'send_media':
+		media_group = []
+		for msg in media_messages:
+			if msg.photo:
+				media_group.append(InputMediaPhoto(msg.photo.file_id))
 
-			await bot.send_media_group(
-				chat_id=channel_id,
-				media=media_group
-				)
+			elif msg.video:
+				media_group.append(InputMediaVideo(msg.video.file_id))
 
-			await message.reply(
-				text='Sent to channel',
-				reply_markup=ReplyKeyboardRemove()
-				)
+		users[message.chat.id]['media_group'] = media_group
+		await message.reply(
+			text='<b>Send video/photo AFTER:</b>'
+			)
+		users[message.chat.id]['state'] = 'send_media2'
 
-			await start_message(_, message)
+	if state != 'send_media2':
 		return
 
-	if state != 'send_media':
-		return
-
-	media_group = []
 	for msg in media_messages:
 		if msg.photo:
-			media_group.append(InputMediaPhoto(msg.photo.file_id))
+			users[message.chat.id]['media_group'].append(InputMediaPhoto(msg.photo.file_id))
 
 		elif msg.video:
-			media_group.append(InputMediaVideo(msg.video.file_id))
+			users[message.chat.id]['media_group'].append(InputMediaVideo(msg.video.file_id))
 
-	media_group[len(media_group)-1].caption = f'''OMO: {users[message.chat.id]["OMO"]}
+
+	users[message.chat.id]['media_group'][-1].caption = f'''OMO: {users[message.chat.id]["OMO"]}
 {users[message.chat.id]["AFFIDAVIT"]}
 {users[message.chat.id]["AFFIDAVIT_TEXT"]}
 '''
 
+
 	await bot.send_media_group(
 		chat_id=channel_id,
-		media=media_group
+		media=users[message.chat.id]['media_group']
 		)
 
 	await message.reply(
@@ -487,58 +451,41 @@ async def media_handler(_, message):
 
 	state = users[message.chat.id]['state']
 
-	if state in ['send_media_affidavit3.1', 'send_media_affidavit3.2']:
-		if state == 'send_media_affidavit3.1':
-			users[message.chat.id]['media'] = [InputMediaPhoto(message.photo.file_id) if message.photo else InputMediaVideo(message.video.file_id)]
-			await message.reply(
-				text='<b>and completing it on:</b>',
-				reply_markup=ReplyKeyboardRemove()
-				)
-			users[message.chat.id]['state'] = 'affidavit3.3'
+	if state == 'send_media':
+		if message.photo:
+			users[message.chat.id]['media_group'] = [InputMediaPhoto(message.photo.file_id)]
 
-		else:
-			users[message.chat.id]['media'].append(InputMediaPhoto(message.photo.file_id) if message.photo else InputMediaVideo(message.video.file_id))
+		elif message.video:
+			users[message.chat.id]['media_group'] = [InputMediaVideo(message.video.file_id)]
 
-			media_group = users[message.chat.id]['media']
-			media_group[len(media_group) - 1].caption = f'''OMO: {users[message.chat.id]["OMO"]}\n{users[message.chat.id]["AFFIDAVIT"]}\n{users[message.chat.id]["AFFIDAVIT_TEXT"]}'''
-			await bot.send_media_group(
-				chat_id=channel_id,
-				media=media_group
-				)
+		await message.reply(
+			text='<b>Send video/photo AFTER:</b>'
+			)
+		users[message.chat.id]['state'] = 'send_media2'
 
-			await message.reply(
-				text='Sent to channel',
-				reply_markup=ReplyKeyboardRemove()
-				)
-
-			await start_message(_, message)
+	if state != 'send_media2':
 		return
 
-	if state != 'send_media':
-		return
+	if message.photo:
+		users[message.chat.id]['media_group'].append(InputMediaPhoto(message.photo.file_id))
+
+	elif message.video:
+		users[message.chat.id]['media_group'].append(InputMediaVideo(message.video.file_id))
 
 	caption = f'''OMO: {users[message.chat.id]["OMO"]}
 {users[message.chat.id]["AFFIDAVIT"]}
 {users[message.chat.id]["AFFIDAVIT_TEXT"]}
 '''
-
-	if message.photo:
-		await bot.send_photo(
-			chat_id=channel_id,
-			photo=message.photo.file_id,
-			caption=caption
-			)
-
-	elif message.video:
-		await bot.send_video(
-			chat_id=channel_id,
-			video=message.video.file_id,
-			caption=caption
-			)
+	users[message.chat.id]['media_group'][-1].caption = caption
+	await bot.send_media_group(
+		chat_id=channel_id,
+		media=users[message.chat.id]['media_group']
+		)
 
 	await message.reply(
 		text='Sent to channel',
-		reply_markup=ReplyKeyboardRemove()		)
+		reply_markup=ReplyKeyboardRemove()
+		)
 
 	await start_message(_, message)
 

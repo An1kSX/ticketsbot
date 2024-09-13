@@ -9,7 +9,11 @@ load_dotenv()
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 bot_token = os.getenv("BOT_TOKEN")
-channel_id = int(os.getenv("CHANNEL_ID"))
+
+try:
+	channel_id = int(os.getenv("CHANNEL_ID"))
+except:
+	channel_id = os.getenv("CHANNEL_ID")
 
 
 bot = Client(
