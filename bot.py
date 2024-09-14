@@ -87,7 +87,7 @@ async def text_handler(_, message):
 	state = users[message.chat.id]['state']
 
 	if state == 'send_omo':
-		users[message.chat.id]['OMO'] = message.text
+		users[message.chat.id]['OMO'] = f'<code>{message.text}</code>'
 		await start_message(_, message)
 
 	elif state == 'menu':
@@ -98,7 +98,7 @@ async def text_handler(_, message):
 					reply_markup=ReplyKeyboardRemove()
 					)
 				users[message.chat.id]['state'] = 'affidavit1'
-				users[message.chat.id]['AFFIDAVIT'] = message.text
+				users[message.chat.id]['AFFIDAVIT'] = f'<code>{message.text}</code>'
 
 			case 'AFFIDAVIT OF REFUSED ACCESS':
 				await message.reply(
@@ -111,7 +111,7 @@ async def text_handler(_, message):
 						)
 					)
 				users[message.chat.id]['state'] = 'affidavit2'
-				users[message.chat.id]['AFFIDAVIT'] = message.text
+				users[message.chat.id]['AFFIDAVIT'] = f'<code>{message.text}</code>'
 
 			case 'AFFIDAVIT OF COMPLETED':
 				await message.reply(
@@ -119,7 +119,7 @@ async def text_handler(_, message):
 					reply_markup=ReplyKeyboardRemove()
 					)
 				users[message.chat.id]['state'] = 'affidavit3'
-				users[message.chat.id]['AFFIDAVIT'] = message.text
+				users[message.chat.id]['AFFIDAVIT'] = f'<code>{message.text}</code>'
 
 			case 'AFFIDAVIT BY OTHERS':
 				await message.reply(
@@ -133,7 +133,7 @@ async def text_handler(_, message):
 						)
 					)
 				users[message.chat.id]['state'] = 'affidavit4_'
-				users[message.chat.id]['AFFIDAVIT'] = message.text
+				users[message.chat.id]['AFFIDAVIT'] = f'<code>{message.text}</code>'
 
 			case _:
 				await message.reply(
@@ -141,7 +141,7 @@ async def text_handler(_, message):
 					)
 
 	elif state == 'affidavit1':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I could not perform the work as directed because that portion of the premises in which the work performed was physically Inaccessible. The Inaccessibility was due to {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I could not perform the work as directed because that portion of the premises in which the work performed was physically Inaccessible. The Inaccessibility was due to: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -175,20 +175,20 @@ async def text_handler(_, message):
 
 	elif state in ['affidavit2.1.1', 'affidavit2.2.1']:
 		if state == 'affidavit2.1.1':
-			users[message.chat.id]['AFFIDAVIT_TEXT'] = message.text if message.text == 'The individual refused to give his/her name' else f'The Individual gave his/her name as: {message.text}'
+			users[message.chat.id]['AFFIDAVIT_TEXT'] = message.text if message.text == '<code>The individual refused to give his/her name</code>' else f'The Individual gave his/her name as: <code>{message.text}</code>'
 		else:
-			users[message.chat.id]['AFFIDAVIT_TEXT'] = message.text if message.text == 'The individual refused to give his/her name' else f'The individual who prevented me from starting/completing the work: {message.text}'
+			users[message.chat.id]['AFFIDAVIT_TEXT'] = message.text if message.text == '<code>The individual refused to give his/her name</code>' else f'The individual who prevented me from starting/completing the work: <code>{message.text}</code>'
 
 		await message.reply(
-			text='<b>The individual stated that his/her relationship to the building was:</b>\n\n<i>Click the button below if the individual refused to state his/her relationship to the building</i>',
-			reply_markup=ReplyKeyboardMarkup([[KeyboardButton('The Individual refused to state his/her relationship to the building')]],
+			text='<b>The individual stated that his/her relationship to the building was:</b>\n\n<i>Click the button below if the individual refused to disclose his/her relationship to the building</i>',
+			reply_markup=ReplyKeyboardMarkup([[KeyboardButton('The Individual refused to disclose his/her relationship to the building')]],
 				resize_keyboard=True,
 				)
 			)
 		users[message.chat.id]['state'] = 'affidavit2.1.2' if state == 'affidavit2.1.1' else 'affidavit2.2.2'
 
 	elif state in ['affidavit2.1.2', 'affidavit2.2.2']:
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\n{message.text}' if message.text == 'The Individual refused to state his/her relationship to the building' else f'\nThe individual stated that his/her relationship to the building was: {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\n{message.text}' if message.text == '<code>The Individual refused to disclose his/her relationship to the building</code>' else f'\nThe individual stated that his/her relationship to the building was: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Description of individual (e.g., male/female, tall/short, dark/light hair):</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -196,7 +196,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'description2' if state == 'affidavit2.2.2' else 'description1'
 
 	elif state == 'description1':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\nIndividual description: {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\nIndividual description: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Did the individual indicate work was completed?</b>',
 			reply_markup=ReplyKeyboardMarkup([
@@ -209,7 +209,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'work_complete'
 
 	elif state == 'description2':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\nIndividual description: {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'\nIndividual description: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -219,10 +219,10 @@ async def text_handler(_, message):
 	elif state == 'work_complete':
 		match message.text:
 			case 'Yes':
-				users[message.chat.id]['AFFIDAVIT_TEXT'] += '\nThe individual indicated that the work was completed'
+				users[message.chat.id]['AFFIDAVIT_TEXT'] += '\nDid the individual indicate work was completed: <code>The individual indicated that the work was completed</code>'
 
 			case 'No':
-				users[message.chat.id]['AFFIDAVIT_TEXT'] += '\nThe individual did not indicate that the work was completed'
+				users[message.chat.id]['AFFIDAVIT_TEXT'] += '\nDid the individual indicate work was completed: <code>The individual did not indicate that the work was completed</code>'
 
 			case _:
 				await message.reply(
@@ -237,7 +237,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'send_media'
 
 	elif state == 'affidavit3':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I have performed this work beginning on {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'I have performed this work beginning on: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>and completing it on:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -245,7 +245,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'affidavit3.3'
 
 	elif state == 'affidavit3.3':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f' and completing it on {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f' and completing it on: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -256,21 +256,21 @@ async def text_handler(_, message):
 		match message.text:
 			case '4':
 				await message.reply(
-					text='When I arrived at the work site on \n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
+					text='When I arrived at the work site on:\n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
 					reply_markup=ReplyKeyboardRemove()
 					)
 				users[message.chat.id]['state'] = 'affidavit4_4'
 
 			case '5':
 				await message.reply(
-					text='When I arrived at the work site on \n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
+					text='When I arrived at the work site on:\n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
 					reply_markup=ReplyKeyboardRemove()
 					)
 				users[message.chat.id]['state'] = 'affidavit4_5'
 
 			case '6':
 				await message.reply(
-					text='When I arrived at the work site on \n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
+					text='When I arrived at the work site on:\n\n<i>Fill in with date. Date format (mm/dd/yy)</i>',
 					reply_markup=ReplyKeyboardRemove()
 					)
 				users[message.chat.id]['state'] = 'affidavit4_6'
@@ -281,19 +281,19 @@ async def text_handler(_, message):
 					)
 
 	elif state == 'affidavit4_4':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on: <code>{message.text}</code>, '
 		message.text = '1'
 		users[message.chat.id]['state'] = 'affidavit4.1'
 		await text_handler(_, message)
 
 	elif state == 'affidavit4_5':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on: <code>{message.text}</code>, '
 		message.text = '2'
 		users[message.chat.id]['state'] = 'affidavit4.1'
 		await text_handler(_, message)
 
 	elif state == 'affidavit4_6':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on {message.text}, '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] = f'When I arrived at the work site on: <code>{message.text}</code>, '
 		message.text = '3'
 		users[message.chat.id]['state'] = 'affidavit4.1'
 		await text_handler(_, message)
@@ -311,12 +311,12 @@ async def text_handler(_, message):
 					)
 
 			case '2':
-				users[message.chat.id]['AFFIDAVIT_TEXT'] += 'I found a contractor, '
+				users[message.chat.id]['AFFIDAVIT_TEXT'] += 'I found a contractor: '
 
 				users[message.chat.id]['state'] = 'affidavit4.2.2'
 
 				await message.reply(
-					text='Contractor Company Name and worker at site',
+					text='Contractor Company Name and worker at site: ',
 					reply_markup=ReplyKeyboardRemove()
 					)
 
@@ -336,7 +336,7 @@ async def text_handler(_, message):
 					)
 
 	elif state == 'affidavit4.2.1':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I am entitled to a service charge of $ {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I am entitled to a service charge of $: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -344,7 +344,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'send_media'
 
 	elif state == 'affidavit4.2.2':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'{message.text} at the site performing the same repairs I was directed to perform pursuant to OMO #{users[message.chat.id]["OMO"]}. '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'<code>{message.text}</code> at the site performing the same repairs I was directed to perform pursuant to OMO #<code>{users[message.chat.id]["OMO"]}</code>. '
 		await message.reply(
 			text='I am entitled to a service charge of $:',
 			reply_markup=ReplyKeyboardRemove()
@@ -352,7 +352,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'affidavit4.3.1'
 
 	elif state == 'affidavit4.2.3':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I performed the remaining work described in the OMO, and am entitled to a charge in the amount of $ {message.text}. (To be compensated for this work, the Contractor must attach an itemized invoice of work performed.)'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I performed the remaining work described in the OMO, and am entitled to a charge in the amount of $: <code>{message.text}</code>. (To be compensated for this work, the Contractor must attach an itemized invoice of work performed.)'
 		await message.reply(
 			text='<b>Send video/photo BEFORE:</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -360,7 +360,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'send_media'
 
 	elif state == 'affidavit4.3.1':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I am entitled to a service charge of $ {message.text}. '
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += f'I am entitled to a service charge of $: <code>{message.text}</code>. '
 		await message.reply(
 			text='<b>The individual gave his/her name as:</b>\n\n<i>Click the button below if the individual refused to give his/her name</i>',
 			reply_markup=ReplyKeyboardMarkup([
@@ -371,7 +371,7 @@ async def text_handler(_, message):
 		users[message.chat.id]['state'] = 'affidavit4.3.2'
 
 	elif state == 'affidavit4.3.2':
-		users[message.chat.id]['AFFIDAVIT_TEXT'] += message.text if message.text == 'The individual refused to give his/her name' else f'The Individual gave his/her name as: {message.text}'
+		users[message.chat.id]['AFFIDAVIT_TEXT'] += message.text if message.text == '<code>The individual refused to give his/her name</code>' else f'The Individual gave his/her name as: <code>{message.text}</code>'
 		await message.reply(
 			text='<b>Description of individual (e.g., male, female, tall/short, dark/light hair):</b>',
 			reply_markup=ReplyKeyboardRemove()
@@ -425,8 +425,8 @@ async def media_group_handler(_, message):
 			users[message.chat.id]['media_group'].append(InputMediaVideo(msg.video.file_id))
 
 
-	users[message.chat.id]['media_group'][-1].caption = f'''OMO: {users[message.chat.id]["OMO"]}
-{users[message.chat.id]["AFFIDAVIT"]}
+	users[message.chat.id]['media_group'][-1].caption = f'''OMO: <code>{users[message.chat.id]["OMO"]}</code>
+AFFIDAVIT: <code>{users[message.chat.id]["AFFIDAVIT"]}</code>
 {users[message.chat.id]["AFFIDAVIT_TEXT"]}
 '''
 
@@ -472,8 +472,8 @@ async def media_handler(_, message):
 	elif message.video:
 		users[message.chat.id]['media_group'].append(InputMediaVideo(message.video.file_id))
 
-	caption = f'''OMO: {users[message.chat.id]["OMO"]}
-{users[message.chat.id]["AFFIDAVIT"]}
+	caption = f'''OMO: <code>{users[message.chat.id]["OMO"]}</code>
+AFFIDAVIT: <code>{users[message.chat.id]["AFFIDAVIT"]}</code>
 {users[message.chat.id]["AFFIDAVIT_TEXT"]}
 '''
 	users[message.chat.id]['media_group'][-1].caption = caption
